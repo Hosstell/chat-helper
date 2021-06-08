@@ -1,5 +1,7 @@
 import spacy
 
+from morphy.utils import get_norm_form
+
 
 def get_all_children(token, first_time=True):
     output = []
@@ -10,19 +12,29 @@ def get_all_children(token, first_time=True):
     return output
 
 
-def get_all_lefts_and_rights(token, state, filter_ = None):
-    if filter_ and not filter_(token):
-        return state
-
+def get_all_lefts_and_rights(token, state, stop = None):
     for left in token.lefts:
-        state = get_all_lefts_and_rights(left, state)
+        state = get_all_lefts_and_rights_with_check(left, state, stop)
 
     state.append(token)
 
     for right in token.rights:
-        state = get_all_lefts_and_rights(right, state)
+        state = get_all_lefts_and_rights_with_check(right, state, stop)
 
     return state
+
+
+def get_all_lefts_and_rights_with_check(token, state, stop = None):
+    if stop and stop(token):
+        return state
+
+    return get_all_lefts_and_rights(token, state, stop)
+
+
+def get_which_word(token):
+    if get_norm_form(token.text) == "который":
+        return token.head.head
+    return token
 
 
 if __name__ == '__main__':
