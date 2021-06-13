@@ -4,8 +4,8 @@ from question_answer_generator.questions.actions import create_action_questions_
 
 class QuestionAnswerGenerator:
     methods = [
-        # create_action_questions_for_object,
-        # create_adjective_questions_for_object,
+        create_action_questions_for_object,
+        create_adjective_questions_for_object,
         create_subject_questions_for_object
     ]
 

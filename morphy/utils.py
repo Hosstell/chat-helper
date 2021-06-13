@@ -35,20 +35,31 @@ def change_form(target: str, source: str) -> str:
     return target.word
 
 
-def get_norm_form(word: str):
+def get_norm_form(word: str) -> str:
     word = morph.parse(word)[0]
     return word.normalized.word
 
 
+def is_animated(word: str):
+    word = morph.parse(word)[0]
+    return word.tag.animacy == 'anim'
+
+
+def is_inanimate(word: str):
+    return not is_animated(word)
+
+
+def is_pron(word: str):
+    word = morph.parse(word)[0]
+    return word.tag.POS == "NPRO"
+
+
+def get_morph(word: str):
+    return morph.parse(word)[0]
+
+
 if __name__ == "__main__":
     # result = get_norm_form("которые")
-    result = change_form("Какой", "ответственность")
+    # result = change_form("Какой", "ответственность")
+    result = is_animated("Бег")
     print(result)
-    # result = change_form("Какой", "ответственность")
-    # print(result)
-    # result = change_form("Какой", "ответственность")
-    # print(result)
-    # result = change_form("Какой", "ответственность")
-    # print(result)
-    # result = change_form("Какой", "ответственность")
-    # print(result)

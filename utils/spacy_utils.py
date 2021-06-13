@@ -37,7 +37,18 @@ def get_which_word(token):
     return token
 
 
+def get_main_head(token):
+    if token == token.head:
+        return token
+    return get_main_head(token.head)
+
+
+def get_all_parents(token, stop=None):
+    main_head = get_main_head(token)
+    return get_all_lefts_and_rights_with_check(main_head, [], stop)
+
+
 if __name__ == '__main__':
     nlp = spacy.load("ru_core_news_md")
     doc = nlp("Я сделал это просто так")
-    print(get_all_lefts_and_rights(doc[1], []))
+    print(get_all_parents(doc[4], lambda x: x == doc[4]))

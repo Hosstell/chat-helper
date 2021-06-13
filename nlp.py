@@ -1,3 +1,3 @@
 import spacy
 
-nlp = spacy.load("ru_core_news_md")
+nlp = spacy.load("ru_core_news_lg")

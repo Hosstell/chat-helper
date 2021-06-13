@@ -1,7 +1,7 @@
-from morphy.utils import change_form
+from morphy.utils import change_form, is_animated, is_pron
 from nlp import nlp
-from utils.data_utils import get_input_text
-from utils.spacy_utils import get_all_lefts_and_rights, get_which_word
+from utils.data_utils import get_input_text, get_input_sentences
+from utils.spacy_utils import get_all_lefts_and_rights, get_which_word, get_all_parents
 
 
 def create_action_questions_for_object(text):
@@ -64,16 +64,26 @@ def create_adjective_questions_for_object(text):
             token.dep_ == 'amod'
         ])
         if conditions:
+            question_suffix = get_all_parents(token, lambda x: x == token.head)
+            if len(question_suffix) and question_suffix[-1].text == '.':
+                question_suffix.pop()
+            question_suffix = list(map(lambda x: x.text, question_suffix))
+            question_suffix = " ".join(question_suffix)
+            question_suffix = question_suffix.lower()
+
             question_text = token.head.text
             question_word = change_form("Какой", question_text)
 
             children = list(token.head.children)
             if len(children) > 0 and children[0].dep_ == 'case':
-                question = f"{children[0].text.capitalize()} {question_word.lower()} {question_text}?"
+                case = children[0].text.capitalize()
+                question = f"{case} {question_word.lower()} {question_text} {question_suffix}?"
+                answer = change_form(token.text, question_text)
+                answer = f"{case} {answer}".capitalize()
             else:
-                question = f"{question_word.capitalize()} {question_text}?"
+                question = f"{question_word.capitalize()} {question_text} {question_suffix}?"
+                answer = change_form(token.text, question_text).capitalize()
 
-            answer = change_form(token.text, question_text).capitalize()
             output_data.append([question, answer])
 
     return output_data
@@ -93,22 +103,31 @@ def create_subject_questions_for_object(text):
             any([
                 token.dep_ == "nsubj",
                 token.dep_ == "nsubj:pass",
-                ]),
+            ]),
             token.head.pos_ == "VERB"
         ])
         if conditions:
             def stop(token_):
                 condition = any([
-                    token == token_
+                    token == token_,
+                    token.dep_ == 'mark'
                 ])
                 return condition
 
+            question_word = "Кто" if is_animated(token.text) or is_pron(token.text) else "Что"
             question = get_all_lefts_and_rights(token.head, [], stop)
+            if len(question) and question[-1].text == '.':
+                question.pop()
+
             question = list(map(lambda x: x.text, question))
             question = " ".join(question)
-            question = f"Кто {question}?"
+            question = question.lower()
+            question = f"{question_word} {question}?"
 
-            answer = token.text.capitalize()
+            answer = get_all_lefts_and_rights(token, [])
+            answer = list(map(lambda x: x.text, answer))
+            answer = " ".join(answer)
+            answer = answer.capitalize()
 
             output_data.append([question, answer])
 
@@ -116,6 +135,7 @@ def create_subject_questions_for_object(text):
 
 
 if __name__ == '__main__':
-    sentence = get_input_text()
-    result = create_subject_questions_for_object(sentence)
+    # sentences = get_input_sentences()
+    sentences = ["Его взгял упал на стол"]
+    result = create_subject_questions_for_object(sentences[0])
     print(result)
