@@ -27,7 +27,6 @@ pymorphy2-dicts-ru==2.4.417127.4579844
 pyparsing==2.4.7
 pytest==6.2.4
 requests==2.25.1
-ru-core-news-lg @ https://github.com/explosion/spacy-models/releases/download/ru_core_news_lg-3.0.0/ru_core_news_lg-3.0.0-py3-none-any.whl
 ru-core-news-md @ https://github.com/explosion/spacy-models/releases/download/ru_core_news_md-3.0.0/ru_core_news_md-3.0.0-py3-none-any.whl
 smart-open==3.0.0
 spacy==3.0.6
